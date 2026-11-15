@@ -36,6 +36,11 @@ h1 em{font-style:normal;color:var(--brand2)}
 .stat .v{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .stat .v small{font-size:12px;font-weight:400;color:var(--hint);margin-left:3px}
 .stat .k{font-size:12px;color:var(--hint);margin-top:1px}
+.jumpbox{display:inline-flex;align-items:center;gap:10px;margin:16px 0 2px;padding:8px 15px;border:1px solid #dbe3ef;
+  border-radius:22px;background:#f7f9fd;font-size:13px;line-height:1.5;color:var(--brand);transition:.14s}
+.jumpbox:hover{background:#eef3fb;border-color:#c9d5e8}
+.jumpbox b{font-weight:600}
+.jumpbox span{color:var(--gold);font-size:11.5px;padding-left:10px;border-left:1px solid #e3e9f3}
 
 .layout{display:grid;grid-template-columns:286px 1fr;gap:28px;align-items:start;min-width:0}
 .layout>*{min-width:0}
@@ -224,6 +229,7 @@ footer h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--ink)}
     <h1>全市场公募基金 <em>投资策略与运作分析</em> 全文库</h1>
     <p class="sub">覆盖境内全部已披露 2026 年三季报的公募基金，逐份提取季报正文「报告期内基金投资策略和运作分析」及展望段落，保留原始分段。数据取自中国证监会基金电子披露平台，披露集中在 <b>2026 年 10 月下旬</b>。列表同时给出基金经理、各份额合计规模与 <b>2026 年三季度单季收益率</b>。</p>
     <div class="stats" id="stats"></div>
+    <a class="jumpbox" href="insight.html" id="jump-insight"><b>→ 基金经理独到观点脱水</b><span>已剔除复盘与套话，每条可回查原文</span></a>
   </div>
 </header>
 
@@ -303,6 +309,7 @@ const TP = window.__P || [];          // TP[片号] = [段落...]，全局段落
 const PSIZE = M.psize, NCH = M.pchunks, PDFBASE = M.pdf;
 /* 某些托管带访问口令（如 ?sharecode=xxx），分片请求必须带上同一个查询串 */
 const QS = location.search || "";
+const jp = document.getElementById("jump-insight"); if(jp) jp.href = "insight.html" + QS;
 const TAGK = M.tagK, TYPEK = M.typeK, VEHK = M.vehK, REGK = M.regK, ORGK = M.orgOrder;
 let doneN = 0, exportWaiting = false;
 const pending = {};
