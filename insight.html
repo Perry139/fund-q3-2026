@@ -256,13 +256,31 @@ function renderSide() {
   $("mlist").innerHTML = html;
 }
 $("mgrq").oninput = renderSide;
+
+/* ---------- 管理人深链：#o=易方达 ---------- */
+function setOrg(o) {
+  S.org = o || "";
+  const h = S.org ? "#o=" + encodeURIComponent(S.org) : "";
+  if ((location.hash || "") !== h) {
+    history.replaceState(null, "", location.pathname + location.search + h);
+  }
+  renderSide();
+  render();
+}
+function readHash() {
+  const m = /[#&]o=([^&]*)/.exec(location.hash || "");
+  if (!m) return "";
+  try { return decodeURIComponent(m[1].replace(/\+/g, " ")); } catch (e) { return m[1]; }
+}
+addEventListener("hashchange", () => {
+  const o = readHash();
+  if (o !== S.org) { S.org = o; renderSide(); render(); window.scrollTo({ top: 0 }); }
+});
 $("mlist").onclick = e => {
   const el = e.target.closest(".opt");
   if (!el) return;
-  S.org = el.dataset.o;
-  renderSide();
   if (window.innerWidth <= 980) $("side").classList.remove("show");
-  render();
+  setOrg(el.dataset.o);
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 $("mobbtn").onclick = () => $("side").classList.toggle("show");
@@ -410,7 +428,7 @@ function render() {
 
 $("list").onclick = e => {
   const more = e.target.closest(".more");
-  if (more) { S.org = more.dataset.o; renderSide(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (more) { setOrg(more.dataset.o); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
   const cp = e.target.closest("[data-copy]");
   if (cp) {
     const r = rows.find(x => x.c === cp.dataset.copy && x.d);
@@ -426,6 +444,8 @@ function toast(m) {
   clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 1700);
 }
 
+renderSide();
+S.org = readHash();
 renderSide();
 renderChips();
 render();
