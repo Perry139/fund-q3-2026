@@ -81,6 +81,25 @@ aside::-webkit-scrollbar-thumb{background:#d7dce5;border-radius:4px}
 select{height:40px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer}
 .tbtn{height:40px;padding:0 13px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-family:inherit;color:var(--sub);cursor:pointer;white-space:nowrap}
 .tbtn:hover{border-color:#c3cddd;color:var(--brand2)}
+.tbtn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.tbtn.on:hover{color:#fff}
+.fcount{display:inline-block;margin-left:6px;min-width:18px;padding:0 5px;border-radius:9px;background:var(--chip);color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums;line-height:17px;text-align:center;vertical-align:1px}
+.tbtn.on .fcount{background:rgba(255,255,255,.22);color:#fff}
+
+/* 收藏星标 */
+.star{flex:0 0 auto;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#c4ccd8;font-size:17px;line-height:1;cursor:pointer;border-radius:6px;padding:0;font-family:inherit;transition:color .13s,background .13s,transform .13s}
+.star:hover{background:#f4f7fc;color:#d9a441;transform:scale(1.12)}
+.star.on{color:#d9a441}
+.star.on:hover{color:#b98a2c}
+.favbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#fdfaf3;border:1px solid #efe4cc;border-radius:9px;padding:10px 13px;margin-bottom:11px;font-size:12.5px;color:#7d6529;line-height:1.6}
+.favbar b{color:#584619;font-weight:600;font-size:13px}
+.favbar .sp{flex:1;min-width:8px}
+.favbar .note{color:#8f7a42}
+.favbar button{font-size:12px;padding:4px 11px;border:1px solid #e6d9bb;border-radius:6px;background:#fff;color:#7d6529;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .13s}
+.favbar button:hover{border-color:#d9c69a;color:#584619}
+.favbar button.danger:hover{border-color:#dfb0a6;color:#a04a3c}
+.btn.on{border-color:#e6d9bb;background:#fdfaf3;color:#8a6d2b}
+
 .resline{font-size:12.5px;color:var(--hint);margin-bottom:11px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .resline b{color:var(--ink);font-weight:600;font-size:14px}
 .chips{display:flex;gap:5px;flex-wrap:wrap}
@@ -239,13 +258,16 @@ footer h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--ink)}
             <option value="ni">规模从小到大</option>
             <option value="qa">Q3收益率从高到低</option>
             <option value="qi">Q3收益率从低到高</option>
+            <option value="ft">收藏时间（最近优先）</option>
             <option value="c">基金代码</option>
             <option value="n">基金名称</option>
             <option value="o">管理人</option>
           </select>
         </div>
+        <button class="tbtn" id="favbtn" title="查看收藏夹">☆ 收藏夹<span class="fcount" id="favcnt">0</span></button>
         <button class="tbtn" id="exp">导出当前结果为 CSV</button>
       </div>
+      <div class="favbar" id="favbar" style="display:none"></div>
       <div class="resline" id="resline"></div>
       <div class="list" id="list"></div>
       <div class="pager" id="pager"></div>
@@ -261,6 +283,7 @@ footer h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--ink)}
       <div class="fitem"><b>章节定位</b><br>以标题关键词为主锚点、编号为校验，兼容 <code>4.4</code>、<code>4.5</code>、<code>（四）</code>、<code>四、</code>、<code>§4</code> 等编号体系差异；右边界取下一同级章节标题，不混入业绩表现与组合明细。</div>
       <div class="fitem"><b>产品分类</b><br>法定类型取自平台披露的基金类型字段（股票型／混合型／债券型／货币型／QDII／FOF／商品基金／公募 REITs）；投资方式与投资区域由基金全称规则判定。</div>
       <div class="fitem"><b>段落还原</b><br>基于 PDF 文字坐标复合变换矩阵还原真实版面位置，按每页正文左边界与段首缩进差识别分段，去除页眉页脚、页码与跨页重复行。</div>
+      <div class="fitem"><b>收藏夹</b><br>星标收藏只写入<b>本机浏览器的 localStorage</b>，不上传服务器、不做账号同步，因此同一台设备换浏览器、或换一台设备打开，收藏状态各自独立、互不干扰。清空浏览器数据会一并清除收藏。收藏夹内同样支持检索、分页与 CSV 导出。</div>
       <div class="fitem"><b>基金经理与规模</b><br>取自天天基金公开数据，规模为<b>资产净值</b>（截止 2026-09-30），已按基金全称将 A/C/E 等<b>各份额加总</b>；后端收费份额与美元份额不重复计入。规模缺失的以「—」标注，不做估算。</div>
       <div class="fitem"><b>Q3 收益率</b><br>取自天天基金「季/年度涨幅」的 <b>26年3季度</b> 列，即 2026-07-01 至 2026-09-30 的单季净值增长率，为<b>分红再投资</b>口径，与季报披露的「本期利润」不同。货币基金按万份收益折算为季度收益率。缺失的以「—」标注。</div>
       <div class="fitem"><b>管理人排序</b><br>按管理人简称的汉语拼音升序排列，「长」字开头（长城、长安、长信、长盛、长江、长量）统一读作 cháng。易方达基金置顶显示。</div>
@@ -360,10 +383,78 @@ function ensureLoaded(f){
   return Promise.all(miss.map(k=>loadChunk(k).catch(()=>{})));
 }
 
-const S = { org:new Set(), type:new Set(), veh:new Set(), reg:new Set(), tag:new Set(), q:"", sort:"wc", page:1 };
+const S = { org:new Set(), type:new Set(), veh:new Set(), reg:new Set(), tag:new Set(), q:"", sort:"wc", page:1, fav:false };
 const PAGE = 20;
 let cur = [];
 let hashPending = decodeURIComponent(location.hash.replace("#","")).trim();
+
+/* ==================== 收藏夹 ====================
+   纯本机存储：只用 localStorage，不发送任何请求、不做云端同步。
+   因此同一篇季报在不同设备上的收藏状态互不干扰；换浏览器或清缓存会各自独立。 */
+const FAVKEY = "fundq3_fav_v1";
+let FAV = {};             // 基金代码 -> 收藏时间戳（毫秒）
+let favOK = true;         // localStorage 是否可用（隐私模式/禁用时降级为本次打开有效）
+
+function favLoad(){
+  try{
+    const raw = localStorage.getItem(FAVKEY);
+    if(raw){
+      const a = JSON.parse(raw);
+      if(Array.isArray(a)) a.forEach(it=>{
+        if(typeof it === "string") FAV[it] = 0;
+        else if(it && it.c) FAV[it.c] = it.t || 0;
+      });
+    }
+  }catch(e){ favOK = false; }
+}
+function favSave(){
+  if(!favOK) return;
+  try{ localStorage.setItem(FAVKEY, JSON.stringify(Object.keys(FAV).map(c=>({c:c, t:FAV[c]||0})))); }
+  catch(e){ favOK = false; }
+}
+function isFav(c){ return Object.prototype.hasOwnProperty.call(FAV, c); }
+function favCount(){ return Object.keys(FAV).length; }
+function favToggle(c){
+  if(isFav(c)) delete FAV[c]; else FAV[c] = Date.now();
+  favSave();
+  return isFav(c);
+}
+function starHtml(c){
+  const on = isFav(c);
+  return `<button class="star${on?" on":""}" data-fav="${c}" title="${on?"取消收藏":"收藏这篇季报摘选"}" aria-label="${on?"取消收藏":"收藏"}">${on?"★":"☆"}</button>`;
+}
+function favBtnHtml(c){
+  const on = isFav(c);
+  return `<button class="btn fav-in-body${on?" on":""}" data-fav="${c}">${on?"★ 已收藏":"☆ 收藏"}</button>`;
+}
+function paintFavUI(){
+  const n = favCount();
+  const cnt = document.getElementById("favcnt");
+  if(cnt) cnt.textContent = n;
+  const btn = document.getElementById("favbtn");
+  if(btn){
+    btn.classList.toggle("on", !!S.fav);
+    btn.innerHTML = (S.fav?"★":"☆") + " 收藏夹" + `<span class="fcount" id="favcnt">${n}</span>`;
+    btn.title = S.fav ? "返回全部基金" : "查看收藏夹";
+  }
+}
+/* 切换收藏：同步刷新页面上该基金的所有星标与收藏按钮 */
+function toggleFav(code){
+  const on = favToggle(code);
+  document.querySelectorAll('.star[data-fav="'+code+'"]').forEach(b=>{
+    b.classList.toggle("on", on);
+    b.textContent = on?"★":"☆";
+    b.title = on?"取消收藏":"收藏这篇季报摘选";
+  });
+  document.querySelectorAll('.fav-in-body[data-fav="'+code+'"]').forEach(b=>{
+    b.classList.toggle("on", on);
+    b.textContent = on?"★ 已收藏":"☆ 收藏";
+  });
+  paintFavUI();
+  if(S.fav) render();     // 在收藏夹视图里取消收藏需立即移除该行
+}
+favLoad();
+if(hashPending === "fav"){ S.fav = true; S.sort = "ft"; hashPending = ""; }
 
 const TYPES = M.typeCounts, VEHS = M.vehCounts, REGS = M.regCounts, TAGS = M.tagCounts;
 
@@ -398,6 +489,7 @@ function hit(f, q){
 }
 
 function match(f, skip){
+  if(S.fav && !isFav(f.c)) return false;     // 收藏夹视图：侧栏计数与列表保持同一口径
   if(skip!=="org"  && S.org.size  && !S.org.has(f.o)) return false;
   if(skip!=="type" && S.type.size && !S.type.has(f.t)) return false;
   if(skip!=="veh"  && S.veh.size  && !S.veh.has(f.v)) return false;
@@ -481,6 +573,7 @@ function filtered(){
   else if(S.sort==="ni") a.sort((x,y)=>(x.nv||0)-(y.nv||0) || x.c.localeCompare(y.c));
   else if(S.sort==="qa") a.sort((x,y)=>((y.q3==null?-1e9:y.q3)-(x.q3==null?-1e9:x.q3)) || x.c.localeCompare(y.c));
   else if(S.sort==="qi") a.sort((x,y)=>((x.q3==null?1e9:x.q3)-(y.q3==null?1e9:y.q3)) || x.c.localeCompare(y.c));
+  else if(S.sort==="ft") a.sort((x,y)=>((FAV[y.c]||0)-(FAV[x.c]||0)) || x.c.localeCompare(y.c));
   else a.sort((x,y)=>x.s.localeCompare(y.s,"zh"));
   return a;
 }
@@ -506,6 +599,7 @@ function rowHtml(f){
       <span class="nav" title="${f.nv?("资产净值合计 "+(f.nv/1e8).toFixed(2)+" 亿元"+(f.ns>1?("，含 "+f.ns+" 个份额"):"")):"规模数据缺失"}">${fmtNav(f.nv)}</span>
       ${q3span(f)}
       <span class="wc">${f.x?"—":num(f.ch)+" 字"}</span>
+      ${starHtml(f.c)}
       <span class="chev">›</span>
     </div>
     <div class="body"></div>
@@ -526,6 +620,7 @@ function bodyHtml(f){
   if(f.x){
     return `<div class="miss">${MISS[f.x]||("未能提取正文（状态："+f.x+"）。")}</div>${perfHtml(f)}
       <div class="foot"><span class="note">已核对至 PDF 原件 · ${esc(f.o)}${esc(mg2)}${esc(nv2)}</span>
+      ${favBtnHtml(f.c)}
       <a class="btn" href="${f.u}" target="_blank" rel="noopener">查看 PDF 原件</a></div>`;
   }
   const t = fundText(f);
@@ -548,6 +643,7 @@ function bodyHtml(f){
   return `<div class="art">${paras}</div>${ol}${perf}
     <div class="foot">
       <span class="note">原始段落 ${st.length} 段 · ${secTxt}${olA.length?" · 含独立展望小节":""} · ${esc(f.o)}${esc(mgTxt)}${esc(navTxt)}</span>
+      ${favBtnHtml(f.c)}
       <button class="btn cp" data-c="${f.c}">复制全文</button>
       <a class="btn" href="${f.u}" target="_blank" rel="noopener">查看 PDF 原件</a>
     </div>`;
@@ -617,8 +713,33 @@ function scrollToList(){
   window.scrollTo({top:y,behavior:"smooth"});
 }
 
+function renderFavBar(){
+  const bar = document.getElementById("favbar");
+  if(!bar) return;
+  if(!S.fav){ bar.style.display="none"; bar.innerHTML=""; return; }
+  bar.style.display="";
+  const n = favCount();
+  bar.innerHTML =
+      `<b>收藏夹</b> 共 ${n} 篇`
+    + `<span class="note">· 收藏保存在本机浏览器，不上传、不同步，各设备之间互不影响</span>`
+    + (favOK ? `` : `<span class="note" style="color:#a04a3c">· 当前浏览器禁用了本地存储，收藏仅在本次打开期间有效</span>`)
+    + `<span class="sp"></span>`
+    + `<button id="favcsv">导出收藏夹 CSV</button>`
+    + `<button id="favclear" class="danger">清空收藏夹</button>`;
+  const bc = document.getElementById("favclear");
+  if(bc) bc.onclick = ()=>{
+    if(!favCount()) return;
+    if(!confirm(`确定清空收藏夹中的 ${favCount()} 篇季报？此操作只在当前设备生效，且无法撤销。`)) return;
+    FAV = {}; favSave(); S.page = 1; render();
+  };
+  const bx = document.getElementById("favcsv");
+  if(bx) bx.onclick = exportCsv;
+}
+
 function render(){
   renderFilters();
+  renderFavBar();
+  paintFavUI();
   cur = filtered();
   if(hashPending){
     const i = cur.findIndex(f=>f.c===hashPending);
@@ -631,16 +752,25 @@ function render(){
   const show = cur.slice(start, start+PAGE);
   const list=document.getElementById("list");
   list.innerHTML = show.length ? show.map(rowHtml).join("")
-    : `<div class="empty">没有符合条件的基金，试试放宽筛选条件</div>`;
+    : (S.fav
+        ? `<div class="empty">${favCount() ? "收藏夹中没有符合当前筛选条件的基金" : "收藏夹还是空的。点击任意一只基金右侧的 ☆ 即可收藏，收藏只保存在本机浏览器，不同设备互不影响。"}</div>`
+        : `<div class="empty">没有符合条件的基金，试试放宽筛选条件</div>`);
   const navSum = cur.reduce((s,f)=>s+(f.nv||0),0);
   const q3v = cur.filter(f=>f.q3!==null&&f.q3!==undefined);
   const q3avg = q3v.length ? q3v.reduce((s,f)=>s+f.q3,0)/q3v.length : null;
   document.getElementById("resline").innerHTML =
-    `共 <b>${num(cur.length)}</b> 只基金 · 合计 ${num(cur.reduce((s,f)=>s+f.ch,0))} 字 · 规模 ${fmtNav(navSum)}`
+    (S.fav ? `收藏夹 ` : ``) + `共 <b>${num(cur.length)}</b> 只基金 · 合计 ${num(cur.reduce((s,f)=>s+f.ch,0))} 字 · 规模 ${fmtNav(navSum)}`
     + (q3avg!==null ? ` · Q3 单季平均 ${pct(q3avg)}` : ``)
     + (S.q && !allLoaded() ? ` · <span style="color:#b07d18">正文仍在载入，结果可能继续增加</span>` : ``)
     + (chipsHtml()?`<span class="chips">${chipsHtml()}</span>`:"");
   renderPager(pages, cur.length);
+
+  list.querySelectorAll(".star").forEach(b=>{
+    b.onclick=(e)=>{ e.stopPropagation(); toggleFav(b.dataset.fav); };
+  });
+  list.querySelectorAll(".fav-in-body").forEach(b=>{
+    b.onclick=(e)=>{ e.stopPropagation(); toggleFav(b.dataset.fav); };
+  });
 
   list.querySelectorAll(".row-h").forEach(el=>{
     el.onclick=()=>{
@@ -724,7 +854,7 @@ function exportCsv(){
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `季报策略_${new Date().toISOString().slice(0,10)}_${cur.length}只.csv`;
+  a.download = `${S.fav?"收藏夹":"季报策略"}_${new Date().toISOString().slice(0,10)}_${cur.length}只.csv`;
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
 }
@@ -742,6 +872,14 @@ document.getElementById("mgrq").addEventListener("input",e=>{
   });
 });
 document.getElementById("sort").addEventListener("change",e=>{ S.sort=e.target.value; S.page=1; render(); });
+document.getElementById("favbtn").addEventListener("click",()=>{
+  S.fav = !S.fav;
+  S.page = 1;
+  if(S.fav) S.sort = "ft";
+  document.getElementById("sort").value = S.sort;
+  render();
+  scrollToList();
+});
 document.getElementById("exp").addEventListener("click",exportCsv);
 
 for(let k=0;k<TP.length;k++) if(TP[k]) doneN++;
